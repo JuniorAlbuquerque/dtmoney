@@ -4,7 +4,7 @@ import { ReactComponent as  IncomeIcon } from '../../assets/income.svg'
 import { ReactComponent as OutcomeIcon } from '../../assets/outcome.svg'
 import { FormEvent, useState } from 'react';
 import { Container, TransactionTypeContainer, RadioBox } from './styles';
-import { api } from '../../services';
+import { useTransactionsContext } from '../../hooks/useTransactions';
 
 type NewTransactionModalProps = {
   isOpen: boolean
@@ -18,19 +18,27 @@ export function NewTransactionModal({isOpen, onRequestClose}: NewTransactionModa
   const [title, setTitle] = useState('')
   const [value, setValue] = useState(0)
   const [category, setCategory] = useState('')
+  const { createTransaction } = useTransactionsContext()
 
 
   async function handleCreateNewTransaction(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const data = {
       title,
-      value,
+      amount: value,
       type,
       category
     };
 
     try {
-      await api.post('/transactions', data)
+      await createTransaction(data)
+      
+      onRequestClose()
+      setTitle('')
+      setCategory('')
+      setValue(0)
+      setCategory('')
+      setType('deposit')
     } catch (error) {
       console.log(error)
     }
@@ -56,12 +64,14 @@ export function NewTransactionModal({isOpen, onRequestClose}: NewTransactionModa
         <input 
           placeholder='Título' 
           value={title}
+          required
           onChange={(e) => setTitle(e.target.value)}
         />
         <input 
           placeholder='Valor'
           type="number"
           value={value}
+          required
           onChange={(e) => setValue(Number(e.target.value))}
         />
 
@@ -89,6 +99,7 @@ export function NewTransactionModal({isOpen, onRequestClose}: NewTransactionModa
         <input
           placeholder='Categoria'
           value={category}
+          required
           onChange={(e) => setCategory(e.target.value)}
         />
 

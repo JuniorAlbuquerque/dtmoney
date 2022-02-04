@@ -1,7 +1,8 @@
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import Dashboard from "./Components/Dashboard";
 import { Header } from "./Components/Header";
 import { NewTransactionModal } from "./Components/NewTransactonModal";
+import { TransactionsProvider } from "./hooks/useTransactions";
 import { GlobalStyle } from "./styles/global"
 
 export function App() {
@@ -16,7 +17,7 @@ export function App() {
   }
 
   return (
-    <Fragment>
+    <TransactionsProvider>
       <Header onOpenNewTransactionModal={handleOpenNewTransactionModal} />
       <Dashboard />
 
@@ -25,6 +26,6 @@ export function App() {
         onRequestClose={handleCloseNewTransactionModal}
       />
       <GlobalStyle />
-    </Fragment>
+    </TransactionsProvider>
   );
 }

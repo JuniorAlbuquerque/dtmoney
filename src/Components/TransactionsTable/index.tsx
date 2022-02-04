@@ -1,12 +1,19 @@
-import React, { useEffect } from 'react';
-import { api } from '../../services';
+import { useTransactionsContext } from '../../hooks/useTransactions';
+import { formatDate, formatCurrency } from '../../utils/formats';
 
 import { Container } from './styles';
 
+export type Transaction = {
+  id: string;
+  title: string;
+  type: 'deposit' | 'withdraw';
+  category: string;
+  amount: number;
+  createdAt: Date;
+}
+
 export const TransactionsTable: React.FC = () => {
-  useEffect(() => {
-    api.get('transactions').then(response => console.log(response.data))
-  }, [])
+  const { transactions } = useTransactionsContext()
 
   return (
     <Container>
@@ -21,19 +28,20 @@ export const TransactionsTable: React.FC = () => {
         </thead>
 
         <tbody>
-          <tr>
-            <td>Curso Ignite Rocketseat</td>
-            <td className='deposit'>R$ 150,00</td>
-            <td>Cursos</td>
-            <td>21/12/2021</td>
-          </tr>
-
-          <tr>
-            <td>Curso Ignite Rocketseat</td>
-            <td className='withdraw'>- R$ 150,00</td>
-            <td>Cursos</td>
-            <td>21/12/2021</td>
-          </tr>
+          {
+            transactions?.length ?
+            transactions.map(transaction => (
+              <tr key={transaction.id}>
+                <td>{transaction.title}</td>
+                <td className={transaction.type}>{formatCurrency(transaction.amount, transaction.type)}</td>
+                <td>{transaction.category}</td>
+                <td>{formatDate(transaction.createdAt)}</td>
+              </tr>
+            )) :
+            <tr>
+              <td colSpan={4} align="center">Nenhum registro cadastrado!</td>
+            </tr>
+          }
         </tbody>
       </table>
     </Container>
